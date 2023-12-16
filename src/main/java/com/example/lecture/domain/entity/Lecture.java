@@ -1,8 +1,5 @@
 package com.example.lecture.domain.entity;
 
-import com.example.lms.major.entity.Major;
-import com.example.lms.professor.entity.Professor;
-import com.example.lms.room.entity.Room;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;

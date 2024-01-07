@@ -1,0 +1,18 @@
+
+
+### 전공 호출
+GET http://localhost:1002/api/v1/manager/lectures/holding
+Accept: application/json
+Cookie: AccessToken=eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIyMmIzMjU4NS1jMjE2LTRlZGMtODYyZC1mY2RjNDE5NjYyOTUiLCJyb2xlIjoiUFJPRkVTU09SIiwiZXhwIjoxNzAzNzY5MjQ5LCJpYXQiOjE3MDM3NjU2NDl9.1_Reoyd1GVHviasaviIWQv8s8X8nhnOGSd8K_80J96Y
+
+
+### 수강 승인
+POST http://localhost:8000/api/v1/manager/lectures/registration
+Content-Type: application/json
+Cookie: AccessToken=eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiI4ODAyZjEwYi00NjAwLTQ5MDYtOTI5Zi04M2Y1OWQ5MGNlMzgiLCJyb2xlIjoiQURNSU4iLCJleHAiOjE3MDM3NjE0MzQsImlhdCI6MTcwMzc1NzgzNH0.kOPdFCogTEh3FzF25huc_J3IzCTz-lYPTWo_WIDyQI8eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIyMmIzMjU4NS1jMjE2LTRlZGMtODYyZC1mY2RjNDE5NjYyOTUiLCJyb2xlIjoiUFJPRkVTU09SIiwiZXhwIjoxNzAzNzY0ODE4LCJpYXQiOjE3MDM3NjEyMTh9.mU67XrTdbaD90bakCNOhPW9E8Q6BGMZwbRz0bW4OmTc
+
+{
+    "lectureId": 6,
+    "memberId": "22b32585-c216-4edc-862d-fcdc41966295"
+
+}

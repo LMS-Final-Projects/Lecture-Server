@@ -1,8 +1,0 @@
-//교수 더미 데이터
-INSERT INTO professor (id, professor_name, ph_number, email)
-        VALUES ('7d6f858a-d8bd-4074-8c6e-d9c47e21b1a6', '오성', '010-0000-0000', 'john.doe@example.com');
-
-//룸 더미 데이터
-INSERT INTO room (id, room_check, room_number)
-    VALUES(1, false, 101);
-

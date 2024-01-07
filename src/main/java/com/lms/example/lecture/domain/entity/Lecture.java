@@ -9,7 +9,6 @@ import lombok.NoArgsConstructor;
 import java.time.DayOfWeek;
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.UUID;
 
 @Entity
 @Getter
@@ -20,13 +19,13 @@ public class Lecture {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private Integer id;
     @Column(nullable = false)
     private String lectureName;
     @Enumerated(EnumType.STRING)
     private Status status;
     @Column(nullable = false)
-    private Long maximumNumber;
+    private Integer maximumNumber;
     @Column(nullable = false)
     private Integer score;
     private String lectureComment;
@@ -49,7 +48,17 @@ public class Lecture {
     private LocalDateTime acceptedAt;
     @Column(nullable = false)
     private DayOfWeek dayOfWeek;
+    @ElementCollection
+    private List<Integer> classTimes;
 
+
+    public void setClassTimes(List<Integer> classTimes) {
+        this.classTimes = classTimes;
+    }
+
+    public void setStatus(Status status) {
+        this.status = status;
+    }
 
     @Override
     public String toString() {

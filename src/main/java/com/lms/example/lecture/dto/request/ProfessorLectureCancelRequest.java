@@ -14,7 +14,7 @@ import java.util.stream.Collectors;
 @AllArgsConstructor
 @Builder
 public class ProfessorLectureCancelRequest {
-   private List<Long> lectureIds;
+   private List<Integer> lectureIds;
     public List<Lecture> toEntity(){
         return lectureIds.stream()
                 .map(id-> Lecture.builder().id(id).build())

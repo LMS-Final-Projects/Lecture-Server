@@ -13,10 +13,10 @@ import java.util.List;
 @Setter
 public class DenyLectureRes {
 
-    private Long id;
+    private Integer id;
     private String lectureName;
     private Status status;
-    private Long maximumNumber;
+    private Integer maximumNumber;
     private Integer score;
     private String lectureComment;
     private LocalDateTime lectureDate;

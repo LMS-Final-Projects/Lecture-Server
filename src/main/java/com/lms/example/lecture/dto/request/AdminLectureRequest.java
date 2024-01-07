@@ -8,20 +8,15 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
 public class AdminLectureRequest {
-    private Long lectureId;
+    private List<Integer> lectureIds;
     private String memberId;
 
-    public Lecture toEntity() {
-        return Lecture.builder()
-                .id(lectureId)
-                .status(Status.ACCEPT)
-                .acceptedAt(LocalDateTime.now())
-                .build();
-    }
+
 }

@@ -8,19 +8,21 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
 public class AdminDenyLectureRequest {
-    private Long lectureId;
+    private String memberId;
+    private List<Integer> lectureIds;
 
-    public Lecture toEntity() {
-        return Lecture.builder()
-                .id(lectureId)
-                .status(Status.DENIED)
-                .acceptedAt(LocalDateTime.now())
-                .build();
+    public List<Lecture> toEntities() {
+        return lectureIds.stream()
+                .map(id -> Lecture.builder().id(id).build())
+                .collect(Collectors.toList());
     }
+
 }

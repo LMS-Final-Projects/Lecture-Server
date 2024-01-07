@@ -14,6 +14,7 @@ import com.lms.example.lecture.dto.request.ProfessorLectureCancelRequest;
 import com.lms.example.lecture.dto.request.ProfessorLectureRequest;
 import com.lms.example.lecture.dto.response.AllLectureRes;
 import com.lms.example.lecture.repository.LectureRepository;
+import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,6 +36,13 @@ public class LectureService {
     private final LectureRepository lectureRepository;
 
     private final KafkaProducer kafkaProducer;
+    
+    //시작값 1000부터 초기화
+    @PostConstruct
+    public void init() {
+        lectureRepository.updateSequenceStartValue();
+    }
+
 
     //강의 등록 요청(교수)
     @Transactional
@@ -143,19 +151,27 @@ public class LectureService {
 
 
     //강의 요청 거부(어드민)
-    @Transactional // 수정 필요함
+    @Transactional
     public boolean denyLecture(AdminDenyLectureRequest request) {
         try {
-            Lecture lecture = lectureRepository.findById(request.toEntity().getId()).orElseThrow(() -> new NotFoundException("강의 요청이 없습니다."));
-            if (lecture.getStatus().equals(Status.DENIED) || lecture.getStatus().equals(Status.ACCEPT)) {
-               throw new NotFoundException("강의가 이미 처리 되었습니다.");
+            List<Lecture> byIds = lectureRepository.findByIds(request.getLectureIds());
+
+            if (byIds.isEmpty()) {
+                throw new NotFoundException("강의가 없습니다.");
             }
-            Lecture save = lectureRepository.save(request.toEntity());
-            if (save == null){
+
+            for (Lecture lecture : byIds) {
+                lecture.setStatus(Status.DENIED);
+            }
+
+            List<Lecture> savedLectures = lectureRepository.saveAll(byIds);
+
+            if (savedLectures.isEmpty()) {
                 return false;
             }
+
         } catch (Exception e) {
-           throw new RuntimeException(e);
+            throw new RuntimeException("강의 거부 중 오류가 발생했습니다.", e);
         }
         return true;
     }
@@ -166,37 +182,46 @@ public class LectureService {
     @Transactional
     public boolean acceptLecture(AdminLectureRequest request) {
         try {
-            Lecture lecture = lectureRepository.findById(request.toEntity().getId()).orElseThrow(() -> new NotFoundException("강의 요청이 없습니다."));
-            if (lecture.getStatus().equals(Status.DENIED) || lecture.getStatus().equals(Status.ACCEPT)) {
-                throw new NotFoundException("처리되지 않은 강의 목록이 없습니다.");
+
+            List<Lecture> byIds = lectureRepository.findByIds(request.getLectureIds());
+
+            if (byIds.isEmpty()) {
+                throw new NotFoundException("강의가 없습니다.");
             }
 
-            List<Integer> classTimes = new ArrayList<>();
-            int start = lecture.getStartTime();
-            int end = lecture.getStartTime() + lecture.getScore() - 1;
+            List<Lecture> savedLectures = lectureRepository.saveAll(byIds);
 
-            classTimes.addAll(IntStream.rangeClosed(start, end)
-                    .boxed()
-                    .collect(Collectors.toList()));
+            for (Lecture lecture : byIds) {
+                lecture.setStatus(Status.ACCEPT);
 
-            Lecture save = lectureRepository.save(request.toEntity());
+                List<Integer> classTimes = new ArrayList<>();
+                int start = lecture.getStartTime();
+                int end = start + lecture.getScore() - 1;
 
-            KafkaLecture build = KafkaLecture.builder()
-                    .memberId(request.getMemberId())
-                    .lectureId(lecture.getId())
-                    .professorName(lecture.getProfessorName())
-                    .lectureName(lecture.getLectureName())
-                    .score(lecture.getScore())
-                    .startTime(lecture.getStartTime())
-                    .maximumNumber(lecture.getMaximumNumber())
-                    .classTimes(classTimes)
-                    .dayOfWeek(lecture.getDayOfWeek())
-                    .kafkaAction(KafkaAction.CREATE)
-                    .build();
+                classTimes.addAll(IntStream.rangeClosed(start, end)
+                        .boxed()
+                        .collect(Collectors.toList()));
+                lecture.setClassTimes(classTimes);
 
-            kafkaProducer.saveLecture("lecture2", build );
+                KafkaLecture build = KafkaLecture.builder()
+                        .memberId(request.getMemberId())
+                        .lectureId(lecture.getId())
+                        .professorName(lecture.getProfessorName())
+                        .lectureName(lecture.getLectureName())
+                        .score(lecture.getScore())
+                        .startTime(lecture.getStartTime())
+                        .maximumNumber(lecture.getMaximumNumber())
+                        .classTimes(classTimes)
+                        .dayOfWeek(lecture.getDayOfWeek())
+                        .semester(lecture.getSemester())
+                        .year(lecture.getYear())
+                        .contents(lecture.getLectureComment())
+                        .kafkaAction(KafkaAction.CREATE)
+                        .build();
 
-            if (save ==null){
+                kafkaProducer.saveLecture("lecture2", build );
+            }
+            if (savedLectures.isEmpty()) {
                 return false;
             }
         } catch (Exception e) {

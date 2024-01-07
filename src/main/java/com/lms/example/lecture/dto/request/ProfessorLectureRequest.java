@@ -27,7 +27,7 @@ public class ProfessorLectureRequest {
     private List<String> majorNames;
     private String lectureName;
     private String lectureComment;
-    private Long maximumNumber;
+    private Integer maximumNumber;
     private Integer score;
     private Semester semester;
     private DayOfWeek dayOfWeek;
